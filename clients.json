@@ -1,0 +1,10 @@
+[
+  {
+    "name": "DeadDLC",
+    "folder": "DeadDLC",
+    "version": "2.0",
+    "downloadUrl": "https://github.com/ctyleydenis-tech/1213/releases/download/xz/DeadDLC.zip",
+    "minecraftVersion": "1.21.4",
+    "fabricVersion": "0.19.2"
+  }
+]
