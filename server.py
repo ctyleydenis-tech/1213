@@ -4,10 +4,9 @@ import os
 
 KEYS_FILE = "keys.json"
 
-# Создаём keys.json если нет
 if not os.path.exists(KEYS_FILE):
     with open(KEYS_FILE, "w") as f:
-        json.dump({"DEAD-2223-0000-4567": "UNBOUND", "BETA-KEY-12345": "UNBOUND"}, f)
+        json.dump({"DEAD-2223-0000-4567": "UNBOUND"}, f)
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -24,33 +23,38 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         if self.path == "/bind":
-            length = int(self.headers.get("Content-Length", 0))
-            body = json.loads(self.rfile.read(length))
-            key = body.get("key", "")
-            hwid = body.get("hwid", "")
+            try:
+                length = int(self.headers.get("Content-Length", 0))
+                body = json.loads(self.rfile.read(length))
+                key = body.get("key", "")
+                hwid = body.get("hwid", "")
 
-            with open(KEYS_FILE) as f:
-                data = json.load(f)
+                with open(KEYS_FILE) as f:
+                    data = json.load(f)
 
-            if key not in data:
-                self.send_response(400)
+                if key not in data:
+                    self.send_response(400)
+                    self.end_headers()
+                    self.wfile.write(b"INVALID_KEY")
+                    return
+
+                if data[key] != "UNBOUND" and data[key] != hwid:
+                    self.send_response(403)
+                    self.end_headers()
+                    self.wfile.write(b"HWID_MISMATCH")
+                    return
+
+                data[key] = hwid
+                with open(KEYS_FILE, "w") as f:
+                    json.dump(data, f)
+
+                self.send_response(200)
                 self.end_headers()
-                self.wfile.write(b"INVALID_KEY")
-                return
-
-            if data[key] != "UNBOUND" and data[key] != hwid:
-                self.send_response(403)
+                self.wfile.write(b"OK")
+            except Exception as e:
+                self.send_response(500)
                 self.end_headers()
-                self.wfile.write(b"HWID_MISMATCH")
-                return
-
-            data[key] = hwid
-            with open(KEYS_FILE, "w") as f:
-                json.dump(data, f)
-
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write(b"OK")
+                self.wfile.write(str(e).encode())
         else:
             self.send_response(404)
             self.end_headers()
