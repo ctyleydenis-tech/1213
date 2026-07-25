@@ -191,7 +191,7 @@ function initEditor() {
 document.addEventListener('DOMContentLoaded', () => document.body.classList.remove('hud-off'));
 
 // ---------------- demo data (only shown outside the real cef client) ----------------
-if (!window.cef) {
+if (typeof cef === 'undefined') {
   setLevel(42, 67, 172);
   setOnline(986, 995);
   setPing(92);
@@ -205,16 +205,20 @@ if (!window.cef) {
 
 // ---------------- подписка на события CEF (с ретраем как в auth) ----------------
 function setupCefListeners() {
-  if (!window.cef) { setTimeout(setupCefListeners, 200); return; }
-  cef.on('hud:level', setLevel);
-  cef.on('hud:online', setOnline);
-  cef.on('hud:ping', setPing);
-  cef.on('hud:district', setDistrict);
-  cef.on('hud:vitals', setVitals);
-  cef.on('hud:money', setMoney);
-  cef.on('hud:vehicle', setVehicle);
+  if (typeof cef === 'undefined') { setTimeout(setupCefListeners, 200); return; }
+  cef.on('hud:update', (hp, money, exp, hunger, armor, creditCard, warnings, playerid, onlinePlayers, speed) => {
+    if (els.id) els.id.textContent = playerid;
+    if (els.online) els.online.textContent = fmt(onlinePlayers);
+    if (els.cash) els.cash.textContent = fmt(money);
+    if (els.card) els.card.textContent = fmt(creditCard);
+    if (els.speedoKmh) els.speedoKmh.textContent = speed;
+    if (els.health) els.health.textContent = Math.round(hp);
+    if (els.armor) els.armor.textContent = Math.round(armor);
+    if (els.food) els.food.textContent = hunger;
+    if (els.exp) els.exp.textContent = exp;
+    if (warnings && warnings !== 'none') pushNotify(warnings);
+  });
   cef.on('hud:notify', pushNotify);
-  cef.on('hud:style', setStyle);
   cef.on('hud:menu', () => menuOpen());
 }
 setupCefListeners();
