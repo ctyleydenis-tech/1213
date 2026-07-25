@@ -85,7 +85,7 @@ function setVitals(health, armor, food) {
 let _inVehicle = false;
 function setVehicle(inVehicle, speedKmh, fuelPct, gearLabel, seatbeltOn) {
   _inVehicle = inVehicle;
-  els.speedo.style.display = (inVehicle && S.showSpeedo) ? 'flex' : 'none';
+  els.speedo.style.display = inVehicle ? 'flex' : 'none';
   if (!inVehicle) return;
 
   const kmh = Math.round(speedKmh);
@@ -117,6 +117,8 @@ function initEditor() {
   const toolbar = document.getElementById('editor-toolbar');
   const toggleBtn = document.getElementById('editor-toggle');
   const exportBtn = document.getElementById('editor-export');
+  if (!toolbar || !toggleBtn || !exportBtn) return;
+
   toolbar.style.display = 'flex';
 
   const targets = ['.tl-panel', '.tr-panel', '.vitals', '.speedo', '.notify-stack'];
@@ -142,7 +144,6 @@ function initEditor() {
     const rect = dragEl.getBoundingClientRect();
     startX = e.clientX; startY = e.clientY;
     startLeft = rect.left; startTop = rect.top;
-    // switch to left/top positioning, drop right/bottom so dragging is predictable
     dragEl.style.left = rect.left + 'px';
     dragEl.style.top = rect.top + 'px';
     dragEl.style.right = 'auto';
@@ -172,7 +173,7 @@ function initEditor() {
 
   exportBtn.addEventListener('click', () => {
     const wasEditing = editing;
-    setEditing(false); // strip editable outlines/cursor before export
+    setEditing(false);
     const clone = document.documentElement.cloneNode(true);
     clone.querySelector('#editor-toolbar')?.remove();
     clone.querySelectorAll('.editable').forEach(el => el.classList.remove('editable'));
