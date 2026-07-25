@@ -187,6 +187,9 @@ function initEditor() {
   });
 }
 
+// ---------------- force HUD on at startup (ignore saved settings) ----------------
+document.addEventListener('DOMContentLoaded', () => document.body.classList.remove('hud-off'));
+
 // ---------------- demo data (only shown outside the real cef client) ----------------
 if (!window.cef) {
   setLevel(42, 67, 172);
@@ -200,7 +203,9 @@ if (!window.cef) {
   setTimeout(() => pushNotify('Пример уведомления: получен штраф 500$'), 1200);
 }
 
-if (window.cef) {
+// ---------------- подписка на события CEF (с ретраем как в auth) ----------------
+function setupCefListeners() {
+  if (!window.cef) { setTimeout(setupCefListeners, 200); return; }
   cef.on('hud:level', setLevel);
   cef.on('hud:online', setOnline);
   cef.on('hud:ping', setPing);
@@ -212,6 +217,7 @@ if (window.cef) {
   cef.on('hud:style', setStyle);
   cef.on('hud:menu', () => menuOpen());
 }
+setupCefListeners();
 
 // ---------------- theme/style support ----------------
 const THEMES = ['default','blue','green','gold','pink','orange','purple','rainbow'];
