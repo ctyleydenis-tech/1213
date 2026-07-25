@@ -1,6 +1,8 @@
 :root{
   --red: #e0202b;
-  --panel: rgba(10,10,12,0.72);
+  --red-glow: rgba(224,32,43,0.5);
+  --panel: rgba(12,12,15,0.72);
+  --panel-2: rgba(18,18,22,0.85);
   --border: rgba(255,255,255,0.08);
   --text: #f2f1f0;
   --muted: #9a9aa2;
@@ -19,84 +21,124 @@ html,body{
   user-select:none;
 }
 
-/* ===================== top header ===================== */
-.header{
-  position:fixed; top:14px; left:0; right:0;
-  display:flex; align-items:stretch; justify-content:center;
-  gap:10px;
-  padding: 0 16px;
-}
-.header-panel{
+.panel-base{
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  backdrop-filter: blur(3px);
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
 }
 
-/* left panel: 2x2 stat grid */
-.header-left{
-  display:grid; grid-template-columns: 1fr 1fr; gap:2px 18px;
-  padding: 9px 16px; align-content:center;
+/* ===================== TOP LEFT ===================== */
+.tl-panel{
+  position:fixed; top:16px; left:16px;
+  background: var(--panel); border:1px solid var(--border); border-radius:12px;
+  backdrop-filter: blur(4px);
+  padding: 10px 16px;
+  min-width: 150px;
 }
-.header-left .cell{ display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; white-space:nowrap; }
-.header-left .k{ color: var(--muted); font-weight:600; }
-.header-left .ic{ width:14px; height:14px; fill:none; stroke: var(--muted); stroke-width:1.6; }
+.tl-row{ display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; }
+.tl-ic{ width:15px; height:15px; fill:none; stroke: var(--muted); stroke-width:1.6; }
+.tl-sep{ width:1px; height:12px; background: var(--border); margin: 0 6px; }
+.tl-sep-dot{ color: var(--muted); }
+.tl-exp-track{ height:4px; background: rgba(255,255,255,0.08); border-radius:4px; margin:7px 0 5px; overflow:hidden; }
+.tl-exp-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--red), #ff6a6a); transition: width .35s ease; }
+.tl-sub{ font-size:11px; color: var(--muted); font-weight:600; justify-content:space-between; }
+.tl-sub b{ color: var(--text); }
 
-/* center panel: logo + brand */
-.header-center{
-  display:flex; align-items:center; gap:10px;
-  padding: 9px 22px;
+/* ===================== TOP RIGHT ===================== */
+.tr-panel{
+  position:fixed; top:16px; right:16px;
+  display:flex; flex-direction:column; align-items:flex-end; gap:8px;
 }
-.header-center .logo{ width:34px; height:34px; filter: drop-shadow(0 0 6px rgba(224,32,43,0.4)); }
-.brand-title{ font-size:15px; font-weight:800; line-height:1.1; }
-.brand-sub{ font-size:11px; color: var(--muted); letter-spacing:.5px; }
+.tr-server{ text-align:right; padding-right:4px; }
+.tr-server-name{ font-size:15px; font-weight:800; line-height:1.1; }
+.tr-server-sub{ font-size:11px; color: var(--muted); letter-spacing:.5px; }
 
-/* right panel: ping + district */
-.header-right{
-  display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap:4px;
-  padding: 8px 16px;
-  min-width:150px;
-}
-.ping{ font-size:12px; font-weight:700; color:#c98ae0; font-variant-numeric: tabular-nums; }
-.district{ display:flex; align-items:center; gap:7px; font-size:13px; font-weight:700; }
-.district-badge{
-  width:20px; height:20px; border-radius:50%;
-  background: var(--red); color:#fff;
-  display:flex; align-items:center; justify-content:center;
-  font-size:11px; font-weight:800;
+.tr-district{
+  font-size:11px; font-weight:700; color: var(--muted);
+  background: var(--panel); border:1px solid var(--border); border-radius:8px;
+  padding: 4px 10px;
 }
 
-/* ===================== vitals row ===================== */
+.tr-money{
+  background: var(--panel); border:1px solid var(--border); border-radius:12px;
+  backdrop-filter: blur(4px);
+  padding: 8px 14px; display:flex; flex-direction:column; gap:5px; align-items:flex-end;
+  min-width:120px;
+}
+.money-row{ display:flex; align-items:center; gap:7px; font-size:13px; font-weight:800; font-variant-numeric: tabular-nums; }
+.money-row .ic{ width:16px; height:16px; flex-shrink:0; }
+.money-cash{ color: var(--green); font-size:15px; width:auto; text-align:center; }
+.money-card{ fill:none; stroke: var(--green); stroke-width:1.6; }
+.money-donate{ fill:none; stroke: var(--red); stroke-width:1.6; }
+
+.tr-ping{ font-size:11px; font-weight:700; color: #c98ae0; }
+
+/* ===================== VITALS ===================== */
+/* bottom offset leaves room for the native SA:MP radar (default ~130px
+   tall incl. margin, bottom-left). Adjust --map-clearance if your
+   server uses a different radar size/zoom. */
+:root{ --map-clearance: 150px; }
 .vitals{
-  position:fixed; top:76px; left:50%; transform: translateX(-50%);
+  position:fixed; bottom: var(--map-clearance); left:20px;
   display:flex; gap:8px;
-  background: var(--panel); border:1px solid var(--border); border-radius: 30px;
+  background: var(--panel); border:1px solid var(--border); border-radius:30px;
   padding: 7px 10px;
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(4px);
 }
-.vital{
-  display:flex; align-items:center; gap:6px;
-  border-radius: 30px; padding: 5px 12px 5px 6px;
-  font-size:13px; font-weight:800; font-variant-numeric: tabular-nums;
-}
+.vital{ display:flex; align-items:center; gap:6px; border-radius:30px; padding:5px 12px 5px 6px; font-size:13px; font-weight:800; font-variant-numeric: tabular-nums; }
 .vital svg{ width:26px; height:26px; padding:4px; border-radius:50%; flex-shrink:0; }
 .vital-health svg{ fill: var(--red); background: rgba(224,32,43,0.15); }
 .vital-armor svg{ fill: #9aa3ad; background: rgba(154,163,173,0.15); }
-.vital-food svg{ fill: none; stroke:#e0a020; stroke-width:1.6; background: rgba(224,160,32,0.15); }
-.vital-action{ padding: 5px; }
-.vital-action svg{ fill:none; stroke: var(--text); stroke-width:1.6; background: rgba(255,255,255,0.08); }
+.vital-food svg{ fill:none; stroke:#e0a020; stroke-width:1.6; background: rgba(224,160,32,0.15); }
 
-/* ===================== money grid ===================== */
-.money-grid{
-  position:fixed; top:128px; left:50%; transform: translateX(-50%);
-  display:grid; grid-template-columns: repeat(3, auto); gap:6px 22px;
-  background: var(--panel); border:1px solid var(--border); border-radius:10px;
-  padding: 10px 20px;
-  backdrop-filter: blur(3px);
+/* ===================== SPEEDOMETER ===================== */
+.speedo{
+  position:fixed; bottom:20px; right:20px;
+  display:flex; align-items:flex-end; gap:12px;
 }
-.money-row{ display:flex; align-items:center; gap:7px; font-size:13px; font-weight:800; font-variant-numeric: tabular-nums; white-space:nowrap; }
-.money-row .ic{ width:16px; height:16px; flex-shrink:0; }
-.money-cash{ color: var(--green); font-size:15px; width:auto; text-align:center; }
-.money-card, .money-bank, .money-deposit{ fill:none; stroke: var(--green); stroke-width:1.6; }
-.money-weight{ fill:none; stroke: var(--gold); stroke-width:1.6; }
-.money-donate{ fill:none; stroke: var(--red); stroke-width:1.6; }
+.speedo-left{ display:flex; flex-direction:column; align-items:center; gap:6px; padding-bottom:8px; }
+.speedo-belt{
+  width:30px; height:30px; border-radius:50%;
+  background: rgba(88,201,106,0.18); border:1px solid rgba(88,201,106,0.4);
+  display:flex; align-items:center; justify-content:center;
+}
+.speedo-belt svg{ width:16px; height:16px; fill:none; stroke: var(--green); stroke-width:1.6; }
+.speedo-belt.off{ background: rgba(224,32,43,0.18); border-color: rgba(224,32,43,0.4); }
+.speedo-belt.off svg{ stroke: var(--red); }
+.speedo-fuel-track{ width:6px; height:60px; background: rgba(255,255,255,0.08); border-radius:6px; overflow:hidden; display:flex; align-items:flex-end; }
+.speedo-fuel-fill{ width:100%; height:76%; background: linear-gradient(180deg, var(--green), #2f8f42); transition: height .3s ease; }
+.speedo-fuel-pct{ font-size:10px; font-weight:700; color: var(--muted); }
+
+.speedo-main{
+  position:relative; width:190px; height:105px;
+  background: var(--panel); border:1px solid var(--border); border-radius: 20px 20px 6px 6px;
+  backdrop-filter: blur(4px);
+  display:flex; align-items:flex-end; justify-content:center;
+  padding-bottom:10px;
+}
+.speedo-arc{ position:absolute; top:6px; left:0; width:100%; height:80px; }
+.speedo-value{ display:flex; flex-direction:column; align-items:center; line-height:1; z-index:1; }
+.speedo-value b{ font-size:30px; font-weight:800; font-variant-numeric: tabular-nums; }
+.speedo-value span{ font-size:10px; color: var(--muted); font-weight:700; letter-spacing:.5px; }
+.speedo-gear{
+  position:absolute; top:10px; right:14px;
+  width:22px; height:22px; border-radius:6px;
+  background: rgba(255,255,255,0.08);
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:800;
+}
+
+/* ===================== NOTIFICATIONS ===================== */
+.notify-stack{
+  position:fixed; top:190px; right:16px;
+  display:flex; flex-direction:column; gap:8px; align-items:flex-end;
+  max-width:260px;
+}
+.notify{
+  background: var(--panel-2); border:1px solid var(--border); border-left:3px solid var(--red);
+  border-radius:8px; padding:9px 12px; font-size:12px; font-weight:600;
+  animation: notifyIn .25s ease, notifyOut .3s ease 3.7s forwards;
+}
+@keyframes notifyIn{ from{ opacity:0; transform: translateX(20px);} to{ opacity:1; transform:none; } }
+@keyframes notifyOut{ from{ opacity:1; } to{ opacity:0; transform: translateX(20px); } }
