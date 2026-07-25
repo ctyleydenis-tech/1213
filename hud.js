@@ -82,8 +82,10 @@ function setVitals(health, armor, food) {
 // Only the district name badge is driven from this HUD.
 
 // ---------------- speedometer / vehicle ----------------
+let _inVehicle = false;
 function setVehicle(inVehicle, speedKmh, fuelPct, gearLabel, seatbeltOn) {
-  els.speedo.style.display = inVehicle ? 'flex' : 'none';
+  _inVehicle = inVehicle;
+  els.speedo.style.display = (inVehicle && S.showSpeedo) ? 'flex' : 'none';
   if (!inVehicle) return;
 
   const kmh = Math.round(speedKmh);
@@ -207,4 +209,391 @@ if (window.cef) {
   cef.on('hud:money', setMoney);
   cef.on('hud:vehicle', setVehicle);
   cef.on('hud:notify', pushNotify);
+  cef.on('hud:style', setStyle);
+  cef.on('hud:menu', () => menuOpen());
 }
+
+// ---------------- theme/style support ----------------
+const THEMES = ['default','blue','green','gold','pink','orange','purple','rainbow'];
+const THEME_LABELS = {
+  default:'Default (Red)', blue:'Blue', green:'Green', gold:'Gold',
+  pink:'Pink', orange:'Orange', purple:'Purple', rainbow:'Rainbow'
+};
+const themeGradients = {
+  default: ['#ff4d4d','#a10f16'], blue:['#4d7bff','#164ba1'],
+  green:['#4dff7b','#16a14b'], gold:['#ffd14d','#a17b16'],
+  pink:['#ff4d9a','#a1165a'], orange:['#ff9a4d','#a15a16'],
+  purple:['#9a4dff','#5a16a1'], rainbow:['#ff4d4d','#a10f16']
+};
+function setStyle(name) {
+  document.body.className = document.body.className.replace(/theme-\S+/g,'').trim();
+  if (name && name !== 'default') document.body.classList.add('theme-'+name);
+  const g = themeGradients[name] || themeGradients.default;
+  const s0 = document.querySelector('.lg-stop-0');
+  const s1 = document.querySelector('.lg-stop-1');
+  if (s0) s0.setAttribute('stop-color',g[0]);
+  if (s1) s1.setAttribute('stop-color',g[1]);
+}
+
+// ==========================================================
+// SETTINGS MENU — SA:MP dialog style with pages
+// ==========================================================
+const STORAGE_KEY = 'funrussia_hud_settings';
+const DRAGGABLE = ['.tl-panel','.tr-panel','.vitals','.speedo','.notify-stack'];
+
+// ---- default settings ----
+const DEFAULTS = {
+  hudEnabled: true,
+  showSpeedo: true,
+  showVitals: true,
+  showMoney: true,
+  showTopPanel: true,
+  theme: 'default',
+  customColors: {},
+  positions: {}
+};
+
+let S = loadSettings();
+
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return { ...DEFAULTS, ...JSON.parse(raw) };
+  } catch {}
+  return { ...DEFAULTS };
+}
+
+function saveSettings() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); } catch {}
+}
+
+// ---- apply saved settings on load ----
+applyAllSettings();
+function applyAllSettings() {
+  applyHudVisibility();
+  applyPositions();
+  if (S.theme) setStyle(S.theme);
+}
+
+function applyHudVisibility() {
+  document.body.classList.toggle('hud-off', !S.hudEnabled);
+  if (!S.hudEnabled) return;
+  els.speedo.style.display = (_inVehicle && S.showSpeedo) ? 'flex' : 'none';
+  document.querySelector('.vitals')?.classList.toggle('menu-hidden', !S.showVitals);
+  document.querySelector('.tr-money')?.closest('.tr-panel')?.classList.toggle('menu-hidden', !S.showMoney);
+  document.querySelector('.tl-panel')?.classList.toggle('menu-hidden', !S.showTopPanel);
+}
+
+// ---- menu DOM refs ----
+const menuEl = document.getElementById('hud-menu');
+const menuBody = document.getElementById('menu-body');
+const menuTitle = document.getElementById('menu-title');
+const menuBack = document.getElementById('menu-back');
+const overlayEl = document.getElementById('menu-overlay');
+let menuPage = null; // null = closed, else page name
+
+// ---- page stack ----
+function menuOpen(page) {
+  menuPage = page || null;
+  menuEl.classList.remove('menu-hidden');
+  renderPage(menuPage);
+}
+function menuClose() {
+  menuPage = null;
+  menuEl.classList.add('menu-hidden');
+}
+function renderPage(page) {
+  menuBack.style.display = page ? 'block' : 'none';
+  menuBody.innerHTML = '';
+  if (!page) renderMain();
+  else if (page === 'display') renderDisplay();
+  else if (page === 'theme') renderTheme();
+  else if (page === 'positions') renderPositions();
+  else if (page === 'colors') renderColors();
+}
+
+function addItem(parent, {label, icon, arrow, onClick, right}) {
+  const btn = document.createElement('button');
+  btn.className = 'menu-item';
+  if (icon) { const s = document.createElement('span'); s.className='menu-icon'; s.textContent=icon; btn.appendChild(s); }
+  const t = document.createElement('span');
+  t.style.flex = '1';
+  t.textContent = label;
+  btn.appendChild(t);
+  if (right) btn.appendChild(right);
+  if (arrow) { const a = document.createElement('span'); a.className='menu-arrow'; a.textContent='▶'; btn.appendChild(a); }
+  btn.addEventListener('click', onClick || (() => {}));
+  parent.appendChild(btn);
+}
+function addLabel(parent, text) {
+  const l = document.createElement('div'); l.className='menu-label'; l.textContent=text; parent.appendChild(l);
+}
+function addSep(parent) {
+  const s = document.createElement('div'); s.className='menu-sep'; parent.appendChild(s);
+}
+
+function makeToggle(on, cb) {
+  const btn = document.createElement('button');
+  btn.className = 'menu-toggle' + (on ? ' on' : '');
+  btn.addEventListener('click', () => { btn.classList.toggle('on'); cb(btn.classList.contains('on')); });
+  return btn;
+}
+function makeRadio(on, cb) {
+  const d = document.createElement('div');
+  d.className = 'menu-radio' + (on ? ' on' : '');
+  d.addEventListener('click', () => { if (!d.classList.contains('on')) { d.classList.add('on'); cb(); }});
+  return d;
+}
+function makeColorSwatch(hex, cb) {
+  const d = document.createElement('div');
+  d.className = 'menu-color-swatch';
+  d.style.background = hex;
+  const inp = document.createElement('input');
+  inp.type = 'color';
+  inp.value = hex;
+  inp.addEventListener('input', () => { d.style.background = inp.value; cb(inp.value); });
+  d.appendChild(inp);
+  return d;
+}
+
+// ---- MAIN MENU ----
+function renderMain() {
+  menuTitle.textContent = 'HUD Settings';
+  addItem(menuBody, { label:'HUD Display', icon:'👁', arrow:true, onClick:()=>menuOpen('display') });
+  addItem(menuBody, { label:'Theme', icon:'🎨', arrow:true, onClick:()=>menuOpen('theme') });
+  addItem(menuBody, { label:'Position Editor', icon:'✋', arrow:true, onClick:()=>menuOpen('positions') });
+  addItem(menuBody, { label:'Custom Colors', icon:'🌈', arrow:true, onClick:()=>menuOpen('colors') });
+  addSep(menuBody);
+  addItem(menuBody, { label:'Reset to Defaults', icon:'↺', onClick:()=>{ resetDefaults(); menuClose(); } });
+}
+
+// ---- DISPLAY PAGE ----
+function renderDisplay() {
+  menuTitle.textContent = 'HUD Display';
+  addItem(menuBody, {
+    label:'HUD Enabled', icon:'👁',
+    right: makeToggle(S.hudEnabled, v => { S.hudEnabled=v; saveSettings(); applyHudVisibility(); })
+  });
+  addItem(menuBody, {
+    label:'Speedometer', icon:'🚗',
+    right: makeToggle(S.showSpeedo, v => { S.showSpeedo=v; saveSettings(); applyHudVisibility(); })
+  });
+  addItem(menuBody, {
+    label:'Vitals (HP/Armor/Food)', icon:'❤',
+    right: makeToggle(S.showVitals, v => { S.showVitals=v; saveSettings(); applyHudVisibility(); })
+  });
+  addItem(menuBody, {
+    label:'Money Panel', icon:'💰',
+    right: makeToggle(S.showMoney, v => { S.showMoney=v; saveSettings(); applyHudVisibility(); })
+  });
+  addItem(menuBody, {
+    label:'Top Panel (Level/Online)', icon:'📊',
+    right: makeToggle(S.showTopPanel, v => { S.showTopPanel=v; saveSettings(); applyHudVisibility(); })
+  });
+}
+
+// ---- THEME PAGE ----
+function renderTheme() {
+  menuTitle.textContent = 'Theme';
+  THEMES.forEach(t => {
+    addItem(menuBody, {
+      label: THEME_LABELS[t] || t,
+      icon: t === 'default' ? '🔴' : '🎨',
+      right: makeRadio(S.theme === t, () => { S.theme = t; saveSettings(); setStyle(t); renderTheme(); })
+    });
+  });
+}
+
+// ---- POSITION EDITOR ----
+let posDragEl = null, posStartX = 0, posStartY = 0, posStartLeft = 0, posStartTop = 0;
+let posEditing = false;
+
+function renderPositions() {
+  menuTitle.textContent = 'Position Editor';
+  const h = document.createElement('div');
+  h.className = 'pos-hint';
+  h.textContent = posEditing ? 'Drag any HUD element to reposition it' : 'Tap "Unlock" to start moving elements';
+  menuBody.appendChild(h);
+  const row = document.createElement('div'); row.className='pos-btn-row';
+  const lockBtn = document.createElement('button');
+  lockBtn.textContent = posEditing ? '🔒 Lock' : '🔓 Unlock';
+  lockBtn.className = posEditing ? 'primary' : '';
+  lockBtn.addEventListener('click', () => { posEditing = !posEditing; renderPositions(); });
+  row.appendChild(lockBtn);
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = '💾 Save';
+  saveBtn.addEventListener('click', () => {
+    DRAGGABLE.forEach(sel => {
+      const el = document.querySelector(sel);
+      if (!el) return;
+      if (el.style.left && el.style.top) {
+        S.positions[sel] = { left: parseFloat(el.style.left), top: parseFloat(el.style.top) };
+      }
+    });
+    saveSettings();
+    pushNotify('Positions saved');
+  });
+  row.appendChild(saveBtn);
+  const resetBtn = document.createElement('button');
+  resetBtn.textContent = '↺ Reset';
+  resetBtn.addEventListener('click', () => {
+    S.positions = {};
+    saveSettings();
+    applyPositions();
+    pushNotify('Positions reset');
+  });
+  row.appendChild(resetBtn);
+  menuBody.appendChild(row);
+}
+
+function applyPositions() {
+  DRAGGABLE.forEach(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    const pos = S.positions[sel];
+    if (pos) {
+      el.style.left = pos.left + 'px';
+      el.style.top = pos.top + 'px';
+      el.style.right = 'auto';
+      el.style.bottom = 'auto';
+      el.style.transform = 'none';
+    } else {
+      el.style.left = ''; el.style.top = ''; el.style.right = ''; el.style.bottom = '';
+      el.style.transform = '';
+    }
+  });
+}
+
+// ---- position drag handlers (live) ----
+function posPointerDown(e) {
+  if (!posEditing) return;
+  posDragEl = e.currentTarget;
+  posDragEl.setPointerCapture(e.pointerId);
+  const r = posDragEl.getBoundingClientRect();
+  posStartX = e.clientX; posStartY = e.clientY;
+  posStartLeft = r.left; posStartTop = r.top;
+  posDragEl.style.left = r.left+'px'; posDragEl.style.top = r.top+'px';
+  posDragEl.style.right = 'auto'; posDragEl.style.bottom = 'auto';
+  posDragEl.style.transform = 'none';
+}
+function posPointerMove(e) {
+  if (!posEditing || !posDragEl) return;
+  posDragEl.style.left = (posStartLeft + e.clientX - posStartX) + 'px';
+  posDragEl.style.top = (posStartTop + e.clientY - posStartY) + 'px';
+}
+function posPointerUp(e) {
+  if (posDragEl) { try { posDragEl.releasePointerCapture(e.pointerId); } catch {} }
+  if (posDragEl) {
+    const sel = '[style*="left"]';
+    // auto-save position on drop
+    DRAGGABLE.forEach(s => {
+      const el = document.querySelector(s);
+      if (el === posDragEl && el.style.left) {
+        S.positions[s] = { left: parseFloat(el.style.left), top: parseFloat(el.style.top) };
+        saveSettings();
+      }
+    });
+  }
+  posDragEl = null;
+}
+
+// ---- attach position drag to all panels ----
+DRAGGABLE.forEach(sel => {
+  const el = document.querySelector(sel);
+  if (!el) return;
+  el.addEventListener('pointerdown', posPointerDown);
+  el.addEventListener('pointermove', posPointerMove);
+  el.addEventListener('pointerup', posPointerUp);
+});
+
+// ---- CUSTOM COLORS PAGE ----
+const COLOR_KEYS = [
+  { key:'accent', label:'Accent Color', default:'#e0202b' },
+  { key:'health', label:'Health Icon', default:'#e0202b' },
+  { key:'armor', label:'Armor Icon', default:'#9aa3ad' },
+  { key:'food', label:'Food Icon', default:'#e0a020' },
+  { key:'moneyCash', label:'Money Cash', default:'#58c96a' },
+  { key:'moneyCard', label:'Money Card', default:'#58c96a' },
+  { key:'donate', label:'Donate Icon', default:'#e0202b' },
+  { key:'panelBg', label:'Panel Background', default:'rgba(12,12,15,0.72)' }
+];
+
+function renderColors() {
+  menuTitle.textContent = 'Custom Colors';
+  COLOR_KEYS.forEach(c => {
+    const cur = S.customColors[c.key] || c.default;
+    const row = document.createElement('div'); row.className='menu-color-row';
+    const lbl = document.createElement('span'); lbl.textContent = c.label;
+    row.appendChild(lbl);
+    const swatch = makeColorSwatch(cur, val => {
+      S.customColors[c.key] = val;
+      saveSettings();
+      applyCustomColors();
+    });
+    row.appendChild(swatch);
+    const resetBtn = document.createElement('button');
+    resetBtn.textContent = '↺';
+    resetBtn.style.cssText = 'background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;';
+    resetBtn.addEventListener('click', () => {
+      delete S.customColors[c.key];
+      saveSettings();
+      applyCustomColors();
+      renderColors();
+    });
+    row.appendChild(resetBtn);
+    menuBody.appendChild(row);
+  });
+  addSep(menuBody);
+  addItem(menuBody, { label:'Reset all colors to default', icon:'↺', onClick:()=>{
+    S.customColors = {};
+    saveSettings();
+    applyCustomColors();
+    renderColors();
+  }});
+}
+
+function applyCustomColors() {
+  const cc = S.customColors;
+  if (cc.accent) document.documentElement.style.setProperty('--accent', cc.accent);
+  else document.documentElement.style.removeProperty('--accent');
+  if (cc.health) document.querySelector('.vital-health svg')?.style.setProperty('fill', cc.health);
+  else document.querySelector('.vital-health svg')?.style.removeProperty('fill');
+  if (cc.armor) document.querySelector('.vital-armor svg')?.style.setProperty('fill', cc.armor);
+  else document.querySelector('.vital-armor svg')?.style.removeProperty('fill');
+  if (cc.food) document.querySelector('.vital-food svg')?.style.setProperty('stroke', cc.food);
+  else document.querySelector('.vital-food svg')?.style.removeProperty('stroke');
+  if (cc.moneyCash) document.querySelector('.money-cash')?.style.setProperty('color', cc.moneyCash);
+  else document.querySelector('.money-cash')?.style.removeProperty('color');
+  if (cc.moneyCard) document.querySelector('.money-card')?.style.setProperty('stroke', cc.moneyCard);
+  else document.querySelector('.money-card')?.style.removeProperty('stroke');
+  if (cc.donate) document.querySelector('.money-donate')?.style.setProperty('stroke', cc.donate);
+  else document.querySelector('.money-donate')?.style.removeProperty('stroke');
+  if (cc.panelBg) {
+    document.querySelectorAll('.tl-panel,.tr-panel,.vitals,.speedo-main').forEach(el => {
+      el.style.setProperty('background', cc.panelBg);
+    });
+  } else {
+    document.querySelectorAll('.tl-panel,.tr-panel,.vitals,.speedo-main').forEach(el => {
+      el.style.removeProperty('background');
+    });
+  }
+}
+
+// ---- reset all ----
+function resetDefaults() {
+  S = { ...DEFAULTS };
+  S.customColors = {};
+  S.positions = {};
+  saveSettings();
+  applyAllSettings();
+  applyCustomColors();
+  pushNotify('Settings reset to defaults');
+}
+
+// ---- overlay close ----
+overlayEl.addEventListener('click', menuClose);
+menuBack.addEventListener('click', () => { menuPage = null; renderPage(null); });
+document.getElementById('menu-close').addEventListener('click', menuClose);
+
+// ---- apply custom colors on startup ----
+applyCustomColors();

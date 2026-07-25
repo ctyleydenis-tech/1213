@@ -33,8 +33,8 @@
         <circle cx="29" cy="20" r="1.6" fill="#0b0b0d"></circle>
         <defs>
           <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#ff4d4d"></stop>
-            <stop offset="1" stop-color="#a10f16"></stop>
+            <stop offset="0" stop-color="#ff4d4d" class="lg-stop-0"></stop>
+            <stop offset="1" stop-color="#a10f16" class="lg-stop-1"></stop>
           </linearGradient>
         </defs>
       </svg>
@@ -86,7 +86,7 @@
     <div class="speedo-main">
       <svg class="speedo-arc" viewBox="0 0 200 110">
         <path d="M10 100 A90 90 0 0 1 190 100" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="8" stroke-linecap="round"></path>
-        <path id="speedo-arc-fill" d="M10 100 A90 90 0 0 1 190 100" fill="none" stroke="#e0202b" stroke-width="8" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283" style="stroke-dashoffset: 283;"></path>
+        <path id="speedo-arc-fill" class="speedo-arc-fill" d="M10 100 A90 90 0 0 1 190 100" fill="none" stroke-width="8" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283" style="stroke-dashoffset: 283;"></path>
       </svg>
       <div class="speedo-value"><b id="speedo-kmh">0</b><span>km/h</span></div>
       <div class="speedo-gear" id="speedo-gear">D</div>
@@ -98,6 +98,19 @@
 
   <!-- ===================== EDITOR TOOLBAR (test mode only) ===================== -->
   
+
+  <!-- ===================== SETTINGS MENU ===================== -->
+  <div id="hud-menu" class="menu-hidden">
+    <div class="menu-overlay" id="menu-overlay"></div>
+    <div class="menu-dialog">
+      <div class="menu-header">
+        <button id="menu-back" class="menu-btn menu-btn-back" style="display:none;">←</button>
+        <span id="menu-title">HUD Settings</span>
+        <button id="menu-close" class="menu-btn menu-btn-close">×</button>
+      </div>
+      <div class="menu-body" id="menu-body"></div>
+    </div>
+  </div>
 
   <script src="hud.js"></script>
 
