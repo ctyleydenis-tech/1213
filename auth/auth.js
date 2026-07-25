@@ -14,30 +14,6 @@ function togglePasswordVisibility() {
   input.type = input.type === 'password' ? 'text' : 'password';
 }
 
-// Keyboard layout indicator
-function initLayoutDetector() {
-  const input = document.getElementById('auth-password');
-  const wrapper = input.closest('.input-wrapper');
-  const badge = document.createElement('span');
-  badge.className = 'layout-badge';
-  badge.textContent = 'EN';
-  badge.style.cssText = 'position:absolute;right:40px;font-size:10px;font-weight:700;color:#696973;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.04);border-radius:4px;padding:2px 5px;pointer-events:none';
-  wrapper.appendChild(badge);
-
-  input.addEventListener('keydown', function(e) {
-    if (e.key.length === 1) {
-      const code = e.key.charCodeAt(0);
-      if ((code >= 0x0400 && code <= 0x04FF) || code === 0x451 || code === 0x451) {
-        badge.textContent = 'RU';
-        badge.style.color = '#ff6b6b';
-      } else if (code >= 0x20 && code <= 0x7E) {
-        badge.textContent = 'EN';
-        badge.style.color = '#696973';
-      }
-    }
-  });
-}
-
 function submitAuthForm() {
   const password = document.getElementById('auth-password').value;
   if (!password || password.length < 6) {
@@ -59,9 +35,30 @@ function hideError() {
   if (el) el.style.display = 'none';
 }
 
-initLayoutDetector();
+// индикатор раскладки
+try {
+  const pwdInput = document.getElementById('auth-password');
+  const wrapper = pwdInput.closest('.input-wrapper');
+  const badge = document.createElement('span');
+  badge.textContent = 'EN';
+  badge.style.cssText = 'position:absolute;right:40px;font-size:10px;font-weight:700;color:#696973;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.04);border-radius:4px;padding:2px 5px;pointer-events:none';
+  wrapper.appendChild(badge);
+  pwdInput.addEventListener('keydown', function(e) {
+    if (e.key.length !== 1) return;
+    const code = e.key.charCodeAt(0);
+    if ((code >= 0x0400 && code <= 0x04FF) || code === 0x401 || code === 0x451) {
+      badge.textContent = 'RU';
+      badge.style.color = '#ff6b6b';
+    } else if (code >= 0x20 && code <= 0x7E) {
+      badge.textContent = 'EN';
+      badge.style.color = '#696973';
+    }
+  });
+} catch(e) {}
 
-if (window.cef) {
+// подписка на события CEF
+function setupCefListeners() {
+  if (!window.cef) { setTimeout(setupCefListeners, 200); return; }
   cef.on('auth:error', function(msg) { showError(msg); });
   cef.on('auth:mode', function(mode) {
     if ((mode === 'register' && authMode !== 'register') || (mode === 'login' && authMode !== 'login')) {
@@ -70,3 +67,4 @@ if (window.cef) {
     hideError();
   });
 }
+setupCefListeners();
