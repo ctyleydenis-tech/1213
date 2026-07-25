@@ -187,23 +187,33 @@ function initEditor() {
   });
 }
 
-// ---------------- wait for cef object, then subscribe ----------------
-(function waitForCef() {
-  if (window.cef) {
-    cef.on('hud:level', setLevel);
-    cef.on('hud:online', setOnline);
-    cef.on('hud:ping', setPing);
-    cef.on('hud:district', setDistrict);
-    cef.on('hud:vitals', setVitals);
-    cef.on('hud:money', setMoney);
-    cef.on('hud:vehicle', setVehicle);
-    cef.on('hud:notify', pushNotify);
-    cef.on('hud:style', setStyle);
-    cef.on('hud:menu', () => menuOpen());
-  } else {
-    setTimeout(waitForCef, 50);
-  }
-})();
+// ---------------- subscribe or fallback demo if cef not ready ----------------
+function subCef() {
+  if (!window.cef) return false;
+  cef.on('hud:level', setLevel);
+  cef.on('hud:online', setOnline);
+  cef.on('hud:ping', setPing);
+  cef.on('hud:district', setDistrict);
+  cef.on('hud:vitals', setVitals);
+  cef.on('hud:money', setMoney);
+  cef.on('hud:vehicle', setVehicle);
+  cef.on('hud:notify', pushNotify);
+  cef.on('hud:style', setStyle);
+  cef.on('hud:menu', () => menuOpen());
+  return true;
+}
+if (!subCef()) {
+  setLevel(42, 67, 172);
+  setOnline(986, 995);
+  setPing(92);
+  setDistrict(18, 'Casa Grande');
+  setVitals(100, 0, 100);
+  setMoney(10074989, 171225869, 1157);
+  setVehicle(true, 0, 76, 'D', true);
+  initEditor();
+  setTimeout(() => pushNotify('Пример уведомления: получен штраф 500$'), 1200);
+  var _si = setInterval(function() { if (subCef()) clearInterval(_si); }, 200);
+}
 
 // ---------------- theme/style support ----------------
 const THEMES = ['default','blue','green','gold','pink','orange','purple','rainbow'];
