@@ -110,6 +110,81 @@ function pushNotify(text) {
   setTimeout(() => el.remove(), 4000);
 }
 
+// ---------------- editor mode (drag panels + export final HTML, test only) ----------------
+function initEditor() {
+  const toolbar = document.getElementById('editor-toolbar');
+  const toggleBtn = document.getElementById('editor-toggle');
+  const exportBtn = document.getElementById('editor-export');
+  toolbar.style.display = 'flex';
+
+  const targets = ['.tl-panel', '.tr-panel', '.vitals', '.speedo', '.notify-stack'];
+  let editing = false;
+  let dragEl = null, startX = 0, startY = 0, startLeft = 0, startTop = 0;
+
+  function setEditing(on) {
+    editing = on;
+    toggleBtn.textContent = 'Двигать элементы: ' + (on ? 'вкл' : 'выкл');
+    toggleBtn.classList.toggle('active', on);
+    targets.forEach(sel => {
+      const el = document.querySelector(sel);
+      if (el) el.classList.toggle('editable', on);
+    });
+  }
+
+  function pxToNum(v) { return parseFloat(v) || 0; }
+
+  function onPointerDown(e) {
+    if (!editing) return;
+    dragEl = e.currentTarget;
+    dragEl.setPointerCapture(e.pointerId);
+    const rect = dragEl.getBoundingClientRect();
+    startX = e.clientX; startY = e.clientY;
+    startLeft = rect.left; startTop = rect.top;
+    // switch to left/top positioning, drop right/bottom so dragging is predictable
+    dragEl.style.left = rect.left + 'px';
+    dragEl.style.top = rect.top + 'px';
+    dragEl.style.right = 'auto';
+    dragEl.style.bottom = 'auto';
+    dragEl.style.transform = 'none';
+  }
+  function onPointerMove(e) {
+    if (!editing || !dragEl) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    dragEl.style.left = (startLeft + dx) + 'px';
+    dragEl.style.top = (startTop + dy) + 'px';
+  }
+  function onPointerUp(e) {
+    if (dragEl) { try { dragEl.releasePointerCapture(e.pointerId); } catch {} }
+    dragEl = null;
+  }
+
+  targets.forEach(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    el.addEventListener('pointerdown', onPointerDown);
+    el.addEventListener('pointermove', onPointerMove);
+    el.addEventListener('pointerup', onPointerUp);
+  });
+
+  toggleBtn.addEventListener('click', () => setEditing(!editing));
+
+  exportBtn.addEventListener('click', () => {
+    const wasEditing = editing;
+    setEditing(false); // strip editable outlines/cursor before export
+    const clone = document.documentElement.cloneNode(true);
+    clone.querySelector('#editor-toolbar')?.remove();
+    clone.querySelectorAll('.editable').forEach(el => el.classList.remove('editable'));
+    const html = '<!DOCTYPE html>\n' + clone.outerHTML;
+    const blob = new Blob([html], { type: 'text/html' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'index.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    if (wasEditing) setEditing(true);
+  });
+}
+
 // ---------------- demo data (only shown outside the real cef client) ----------------
 if (!window.cef) {
   setLevel(42, 67, 172);
@@ -119,6 +194,7 @@ if (!window.cef) {
   setVitals(100, 0, 100);
   setMoney(10074989, 171225869, 1157);
   setVehicle(true, 0, 76, 'D', true);
+  initEditor();
   setTimeout(() => pushNotify('Пример уведомления: получен штраф 500$'), 1200);
 }
 

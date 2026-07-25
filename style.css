@@ -47,11 +47,14 @@ html,body{
 
 /* ===================== TOP RIGHT ===================== */
 .tr-panel{
-  position:fixed; top:16px; right:16px;
+  position:fixed; top:50%; right:16px; transform: translateY(-50%);
   display:flex; flex-direction:column; align-items:flex-end; gap:8px;
 }
-.tr-server{ text-align:right; padding-right:4px; }
-.tr-server-name{ font-size:15px; font-weight:800; line-height:1.1; }
+.tr-server{ display:flex; align-items:center; gap:9px; padding-right:2px; }
+.tr-logo{ width:30px; height:30px; filter: drop-shadow(0 0 6px rgba(224,32,43,0.4)); flex-shrink:0; }
+.tr-server-text{ text-align:right; line-height:1.05; }
+.tr-server-name{ font-size:15px; font-weight:800; letter-spacing:1px; }
+.tr-server-name span{ color: var(--red); }
 .tr-server-sub{ font-size:11px; color: var(--muted); letter-spacing:.5px; }
 
 .tr-district{
@@ -75,12 +78,8 @@ html,body{
 .tr-ping{ font-size:11px; font-weight:700; color: #c98ae0; }
 
 /* ===================== VITALS ===================== */
-/* bottom offset leaves room for the native SA:MP radar (default ~130px
-   tall incl. margin, bottom-left). Adjust --map-clearance if your
-   server uses a different radar size/zoom. */
-:root{ --map-clearance: 150px; }
 .vitals{
-  position:fixed; bottom: var(--map-clearance); left:20px;
+  position:fixed; bottom:20px; left:20px;
   display:flex; gap:8px;
   background: var(--panel); border:1px solid var(--border); border-radius:30px;
   padding: 7px 10px;
@@ -94,7 +93,7 @@ html,body{
 
 /* ===================== SPEEDOMETER ===================== */
 .speedo{
-  position:fixed; bottom:20px; right:20px;
+  position:fixed; bottom:20px; left:50%; transform: translateX(-50%);
   display:flex; align-items:flex-end; gap:12px;
 }
 .speedo-left{ display:flex; flex-direction:column; align-items:center; gap:6px; padding-bottom:8px; }
@@ -142,3 +141,20 @@ html,body{
 }
 @keyframes notifyIn{ from{ opacity:0; transform: translateX(20px);} to{ opacity:1; transform:none; } }
 @keyframes notifyOut{ from{ opacity:1; } to{ opacity:0; transform: translateX(20px); } }
+
+/* ===================== EDITOR TOOLBAR (test mode only) ===================== */
+.editor-toolbar{
+  position:fixed; top:0; left:0; right:0;
+  display:flex; align-items:center; gap:10px;
+  background:#000; border-bottom:1px solid #333;
+  padding:8px 14px; z-index:9999;
+  font-family: Arial, sans-serif;
+}
+.editor-toolbar button{
+  background:#e0202b; color:#fff; border:none; border-radius:6px;
+  padding:6px 14px; font-size:12px; font-weight:700; cursor:pointer;
+}
+.editor-toolbar button.active{ background:#58c96a; }
+.editor-hint{ font-size:11px; color:#999; }
+.editable{ cursor: move; outline: 1px dashed rgba(224,32,43,0.7); outline-offset:2px; }
+.editable:hover{ outline: 2px dashed #58c96a; }
