@@ -187,33 +187,31 @@ function initEditor() {
   });
 }
 
-// ---------------- subscribe to server events ----------------
-(function() {
-  if (window.cef) {
-    try {
-      cef.on('hud:level', setLevel);
-      cef.on('hud:online', setOnline);
-      cef.on('hud:ping', setPing);
-      cef.on('hud:district', setDistrict);
-      cef.on('hud:vitals', setVitals);
-      cef.on('hud:money', setMoney);
-      cef.on('hud:vehicle', setVehicle);
-      cef.on('hud:notify', pushNotify);
-      cef.on('hud:style', setStyle);
-      cef.on('hud:menu', () => menuOpen());
-    } catch(e) { console.error('cef.on error', e); }
-  } else {
-    setLevel(42, 67, 172);
-    setOnline(986, 995);
-    setPing(92);
-    setDistrict(18, 'Casa Grande');
-    setVitals(100, 0, 100);
-    setMoney(10074989, 171225869, 1157);
-    setVehicle(true, 0, 76, 'D', true);
-    initEditor();
-    setTimeout(() => pushNotify('Пример уведомления: получен штраф 500$'), 1200);
-  }
-})();
+// ---------------- demo data (only shown outside the real cef client) ----------------
+if (!window.cef) {
+  setLevel(42, 67, 172);
+  setOnline(986, 995);
+  setPing(92);
+  setDistrict(18, 'Casa Grande');
+  setVitals(100, 0, 100);
+  setMoney(10074989, 171225869, 1157);
+  setVehicle(true, 0, 76, 'D', true);
+  initEditor();
+  setTimeout(() => pushNotify('Пример уведомления: получен штраф 500$'), 1200);
+}
+
+if (window.cef) {
+  cef.on('hud:level', setLevel);
+  cef.on('hud:online', setOnline);
+  cef.on('hud:ping', setPing);
+  cef.on('hud:district', setDistrict);
+  cef.on('hud:vitals', setVitals);
+  cef.on('hud:money', setMoney);
+  cef.on('hud:vehicle', setVehicle);
+  cef.on('hud:notify', pushNotify);
+  cef.on('hud:style', setStyle);
+  cef.on('hud:menu', () => menuOpen());
+}
 
 // ---------------- theme/style support ----------------
 const THEMES = ['default','blue','green','gold','pink','orange','purple','rainbow'];
