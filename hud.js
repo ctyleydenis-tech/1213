@@ -188,9 +188,6 @@ function initEditor() {
   });
 }
 
-// ---------------- force HUD on at startup (ignore saved settings) ----------------
-document.addEventListener('DOMContentLoaded', () => document.body.classList.remove('hud-off'));
-
 // ---------------- demo data (only shown outside the real cef client) ----------------
 if (typeof cef === 'undefined') {
   setLevel(42, 67, 172);
@@ -288,6 +285,7 @@ function saveSettings() {
 
 // ---- apply saved settings on load ----
 applyAllSettings();
+document.body.classList.remove('hud-off'); // force HUD on regardless of saved setting
 function applyAllSettings() {
   applyHudVisibility();
   applyPositions();
