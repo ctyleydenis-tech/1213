@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun Russia RP Auth</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Полноэкранный прозрачный CEF слой -->
+    <div class="auth-screen">
+        
+        <!-- Центральное окно авторизации -->
+        <div class="auth-container">
+            
+            <!-- Логотип проекта Fun Russia -->
+            <div class="auth-logo">F</div>
+
+            <h1 class="auth-title" id="form-title">Войти в аккаунт</h1>
+
+            <!-- Форма ввода -->
+            <form class="auth-form" onsubmit="return false;">
+                
+                <!-- Поле: Выбор Сервера -->
+                <div class="input-group">
+                    <label class="input-label">Сервер</label>
+                    <div class="input-wrapper select-wrapper">
+                        <select id="server-select">
+                            <option value="1">Fun Russia | Moscow</option>
+                        </select>
+                        <span class="server-badge">972*</span>
+                    </div>
+                </div>
+
+                <!-- Поле: Пароль -->
+                <div class="input-group">
+                    <label class="input-label">Пароль</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="auth-password" placeholder="••••••••" required>
+                        <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility()">👁</button>
+                    </div>
+                </div>
+
+                <!-- Ошибка -->
+                <span id="auth-error" style="display:none;color:#ff4d4d;font-size:12px;text-align:center;margin-top:-5px"></span>
+
+                <!-- Кнопка отправки формы -->
+                <button type="submit" class="btn-submit" id="form-submit-btn" onclick="submitAuthForm()">ВОЙТИ</button>
+            </form>
+
+            <!-- Переключалка режимов войти/зарегистрироваться -->
+            <div class="auth-footer">
+                <span id="footer-text">У вас еще нет аккаунта?</span>
+                <button class="btn-switch-mode" id="switch-mode-btn" onclick="toggleAuthMode()">Создать аккаунт</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>
