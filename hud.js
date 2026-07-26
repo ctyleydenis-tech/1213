@@ -206,11 +206,13 @@ function setupCefListeners() {
   if (typeof cef === 'undefined') { setTimeout(setupCefListeners, 200); return; }
   cef.on('hud:ping', (val) => {
     console.log('HUD PING RECEIVED:', val);
+    if (dbg) dbg.textContent = 'PING: ' + JSON.stringify(val);
   });
+  const dbg = document.getElementById('hud-debug');
   cef.on('hud:main', (...args) => {
     console.log('MAIN:', args);
+    if (dbg) dbg.textContent = 'MAIN: ' + args.map(v=>JSON.stringify(v)).join(' | ');
     const [money, playerid, onlinePlayers, hp, armor, hunger, ping, speed] = args;
-    pushNotify('RAW: ' + JSON.stringify([money, playerid, onlinePlayers, hp, armor, hunger, ping, speed]));
     if (els.cash) els.cash.textContent = fmt(money);
     if (els.id) els.id.textContent = playerid;
     if (els.online) els.online.textContent = fmt(onlinePlayers);
@@ -222,6 +224,7 @@ function setupCefListeners() {
   });
   cef.on('hud:extra', (...args) => {
     console.log('EXTRA:', args);
+    if (dbg) dbg.textContent = 'EXTRA: ' + args.map(v=>JSON.stringify(v)).join(' | ');
     const [level, exp, expNeed, creditCard, donate, districtId, inVehicle, fuel, gear, seatbelt] = args;
     if (els.lvl) els.lvl.textContent = level;
     if (els.exp) els.exp.textContent = `${fmt(exp)}/${fmt(expNeed)}`;
