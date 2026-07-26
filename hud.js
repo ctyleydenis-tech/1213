@@ -204,25 +204,25 @@ if (typeof cef === 'undefined') {
 // ---------------- подписка на события CEF (с ретраем как в auth) ----------------
 function setupCefListeners() {
   if (typeof cef === 'undefined') { setTimeout(setupCefListeners, 200); return; }
-  cef.on('hud:update', (hp, money, exp, hunger, armor, creditCard, warnings, playerid, onlinePlayers, speed, level, expNeed, ping, districtId, districtName, donate, inVehicle, fuel, gear, seatbelt) => {
+  cef.on('hud:main', (money, playerid, onlinePlayers, hp, armor, hunger, ping, speed) => {
+    if (els.cash) els.cash.textContent = fmt(money);
     if (els.id) els.id.textContent = playerid;
     if (els.online) els.online.textContent = fmt(onlinePlayers);
-    if (els.cash) els.cash.textContent = fmt(money);
-    if (els.card) els.card.textContent = fmt(creditCard);
-    if (els.speedoKmh) els.speedoKmh.textContent = speed;
     if (els.health) els.health.textContent = Math.round(hp);
     if (els.armor) els.armor.textContent = Math.round(armor);
     if (els.food) els.food.textContent = hunger;
-    if (els.exp) els.exp.textContent = `${fmt(exp)}/${fmt(expNeed)}`;
-    if (els.lvl) els.lvl.textContent = level;
     if (els.ping) els.ping.textContent = `${ping}ms`;
+    if (els.speedoKmh) els.speedoKmh.textContent = speed;
+  });
+  cef.on('hud:extra', (level, exp, expNeed, creditCard, donate, districtId, inVehicle, fuel, gear, seatbelt) => {
+    if (els.lvl) els.lvl.textContent = level;
+    if (els.exp) els.exp.textContent = `${fmt(exp)}/${fmt(expNeed)}`;
     if (els.expFill) {
       const pct = expNeed > 0 ? Math.min((exp / expNeed) * 100, 100) : 0;
       els.expFill.style.width = pct + '%';
     }
-    if (els.districtName) els.districtName.textContent = districtName;
+    if (els.card) els.card.textContent = fmt(creditCard);
     if (els.donate) els.donate.textContent = fmt(donate);
-    if (warnings && warnings !== 'none') pushNotify(warnings);
   });
   cef.on('hud:notify', pushNotify);
   cef.on('hud:menu', () => menuOpen());
