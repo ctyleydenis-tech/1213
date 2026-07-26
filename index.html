@@ -1,119 +1,92 @@
-<!DOCTYPE html>
-<html lang="ru"><head>
-<meta charset="UTF-8">
-<title>Fun Russia HUD</title>
-<link rel="stylesheet" href="style.css">
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fun Russia Premium HUD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- ===================== TOP LEFT: level / online / id ===================== -->
-  <div class="tl-panel">
-    <div class="tl-row">
-      <svg class="tl-ic" viewBox="0 0 24 24"><path d="M12 2 2 8l10 6 10-6z"></path><path d="M2 14l10 6 10-6" opacity="0.5"></path></svg>
-      <b id="hud-lvl">42</b>
-      <span class="tl-sep"></span>
-      <svg class="tl-ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"></circle><path d="M5 20c1.2-4.4 4-6.6 7-6.6s5.8 2.2 7 6.6"></path></svg>
-      <b id="hud-online">995</b>
-    </div>
-    <div class="tl-exp-track"><div class="tl-exp-fill" id="hud-exp-fill" style="width: 38.9535%;"></div></div>
-    <div class="tl-row tl-sub">
-      <span id="hud-exp">67/172</span>
-      <span class="tl-sep-dot">·</span>
-      <span>ID:<b id="hud-id">986</b></span>
-    </div>
-  </div>
-
-  <!-- ===================== TOP RIGHT: server tag / minimap / money ===================== -->
-  <div class="tr-panel">
-    <div class="tr-server">
-      <svg class="tr-logo" viewBox="0 0 48 48">
-        <path d="M24 4 L38 14 L36 30 L24 44 L12 30 L10 14 Z" fill="url(#lg)"></path>
-        <path d="M24 10 L30 18 L24 34 L18 18 Z" fill="#0b0b0d" opacity="0.55"></path>
-        <circle cx="19" cy="20" r="1.6" fill="#0b0b0d"></circle>
-        <circle cx="29" cy="20" r="1.6" fill="#0b0b0d"></circle>
+  <!-- ===================== ЛЕВЫЙ ВЕРХНИЙ УГОЛ: БРЕНД И ИНФО ===================== -->
+  <div class="hud-top-left">
+    <div class="brand-zone">
+      <svg class="logo" viewBox="0 0 48 48">
+        <path d="M24 4 L38 14 L36 30 L24 44 L12 30 L10 14 Z" fill="url(#lg)"/>
+        <path d="M24 10 L30 18 L24 34 L18 18 Z" fill="#0b0b0d" opacity="0.15"/>
         <defs>
           <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#ff4d4d" class="lg-stop-0"></stop>
-            <stop offset="1" stop-color="#a10f16" class="lg-stop-1"></stop>
+            <stop offset="0" stop-color="#ff789e"/>
+            <stop offset="1" stop-color="#ff4b72"/>
           </linearGradient>
         </defs>
       </svg>
-      <div class="tr-server-text">
-        <div class="tr-server-name"><span>FUN</span>RUSSIA</div>
-        <div class="tr-server-sub">Role play</div>
+      <div class="brand-text">
+        <div class="brand-title">Fun Russia</div>
+        <div class="brand-sub">Role Play</div>
       </div>
     </div>
-
-    <div class="tr-district" id="hud-district-name">Casa Grande</div>
-
-    <div class="tr-money">
-      <div class="money-row"><span class="ic money-cash">$</span><b id="hud-cash">10&nbsp;074&nbsp;989</b></div>
-      <div class="money-row"><svg class="ic money-card" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="2"></rect><line x1="2.5" y1="10" x2="21.5" y2="10"></line></svg><b id="hud-card">171&nbsp;225&nbsp;869</b></div>
-      <div class="money-row"><svg class="ic money-donate" viewBox="0 0 24 24"><path d="M12 3 2 20h20z"></path><line x1="12" y1="9" x2="12" y2="14"></line><circle cx="12" cy="17" r="0.8"></circle></svg><b id="hud-donate">1&nbsp;157</b></div>
-    </div>
-
-    <div class="tr-ping" id="hud-ping">92ms</div>
-  </div>
-
-  <!-- ===================== VITALS (bottom-left) ===================== -->
-  <div class="vitals">
-    <div class="vital vital-health">
-      <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2.2 4.5 5.7 4c2-.3 3.8.6 4.9 2.1L12 8l1.4-1.9C14.5 4.6 16.3 3.7 18.3 4c3.5.5 5.3 4.1 3.7 7.7C19.5 16.4 12 21 12 21z"></path></svg>
-      <span id="hud-health">100</span>
-    </div>
-    <div class="vital vital-armor">
-      <svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z"></path></svg>
-      <span id="hud-armor">0</span>
-    </div>
-    <div class="vital vital-food">
-      <svg viewBox="0 0 24 24"><path d="M4 11h16a1 1 0 0 1 1 1c0 4-3.5 7-9 7s-9-3-9-7a1 1 0 0 1 1-1z"></path><path d="M6 11c0-4 2.5-7 6-7s6 3 6 7"></path></svg>
-      <span id="hud-food">100</span>
+    
+    <div class="server-stats">
+      <div class="stat-cell"><span class="lbl">LVL</span><b id="hud-lvl">1</b></div>
+      <div class="stat-cell"><span class="lbl">ID</span><b id="hud-id">0</b></div>
+      <div class="stat-cell">
+        <svg class="ic-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c1.2-4.4 4-6.6 7-6.6s5.8 2.2 7 6.6"/></svg>
+        <b id="hud-online">0</b>
+      </div>
+      <div class="stat-cell-long"><span class="lbl">EXP</span><b id="hud-exp">0/0</b></div>
     </div>
   </div>
 
-  <!-- ===================== SPEEDOMETER (bottom-right, only when in vehicle) ===================== -->
-  <div class="speedo" id="speedo" style="display: flex;">
-    <div class="speedo-left">
-      <div class="speedo-belt" id="speedo-belt" title="Ремень">
-        <svg viewBox="0 0 24 24"><path d="M12 2v20M6 8l6-4 6 4M6 16l6 4 6-4"></path></svg>
-      </div>
-      <div class="speedo-fuel-track">
-        <div class="speedo-fuel-fill" id="speedo-fuel-fill" style="height: 76%;"></div>
-      </div>
-      <div class="speedo-fuel-pct" id="speedo-fuel-pct">76%</div>
+  <!-- ===================== ПРАВЫЙ ВЕРХНИЙ УГОЛ: ДЕНЬГИ И ЛОКАЦИЯ ===================== -->
+  <div class="hud-top-right">
+    <div class="location-bar">
+      <span class="district-badge" id="hud-district-id">0</span>
+      <span id="hud-district-name">Центральный Район</span>
+      <span class="ping-tag" id="hud-ping">65 ms</span>
     </div>
 
-    <div class="speedo-main">
-      <svg class="speedo-arc" viewBox="0 0 200 110">
-        <path d="M10 100 A90 90 0 0 1 190 100" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="8" stroke-linecap="round"></path>
-        <path id="speedo-arc-fill" class="speedo-arc-fill" d="M10 100 A90 90 0 0 1 190 100" fill="none" stroke-width="8" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283" style="stroke-dashoffset: 283;"></path>
-      </svg>
-      <div class="speedo-value"><b id="speedo-kmh">0</b><span>km/h</span></div>
-      <div class="speedo-gear" id="speedo-gear">D</div>
+    <div class="finance-card">
+      <div class="money-row cash-main"><span class="money-symbol">$</span><b id="hud-cash">1,250,500</b></div>
+      <div class="money-divider"></div>
+      <div class="money-sub-grid">
+        <div class="money-cell" title="Карта"><svg class="ic" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="2"/><line x1="2.5" y1="10" x2="21.5" y2="10"/></svg><span id="hud-card">0</span></div>
+        <div class="money-cell" title="Банк"><svg class="ic" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6"/><rect x="4" y="10" width="16" height="9"/></svg><span id="hud-bank">0</span></div>
+        <div class="money-cell" title="Депозит"><svg class="ic" viewBox="0 0 24 24"><ellipse cx="12" cy="9" rx="8" ry="4"/><path d="M4 9v6c0 2.2 3.6 4 8 4s8-1.8 8-4V9"/></svg><span id="hud-deposit">0</span></div>
+        <div class="money-cell" title="Донат"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><circle cx="12" cy="14" r="1"/></svg><span id="hud-donate" class="donate-txt">0 R</span></div>
+      </div>
     </div>
   </div>
 
-  <!-- ===================== NOTIFICATIONS ===================== -->
-  <div class="notify-stack" id="notify-stack"><div class="notify">Пример уведомления: получен штраф 500$</div></div>
-
-  <!-- ===================== EDITOR TOOLBAR (test mode only) ===================== -->
-  
-
-  <!-- ===================== SETTINGS MENU ===================== -->
-  <div id="hud-menu" class="menu-hidden">
-    <div class="menu-overlay" id="menu-overlay"></div>
-    <div class="menu-dialog">
-      <div class="menu-header">
-        <button id="menu-back" class="menu-btn menu-btn-back" style="display:none;">←</button>
-        <span id="menu-title">HUD Settings</span>
-        <button id="menu-close" class="menu-btn menu-btn-close">×</button>
+  <!-- ===================== НИЗ ЭКРАНА: СТИЛЬНЫЕ ПОЛОСКИ СТАТУСА ===================== -->
+  <div class="hud-bottom-center">
+    <div class="vitals-container">
+      <!-- Здоровье -->
+      <div class="bar-wrapper">
+        <div class="bar-icon health-bg"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2.2 4.5 5.7 4c2-.3 3.8.6 4.9 2.1L12 8l1.4-1.9C14.5 4.6 16.3 3.7 18.3 4c3.5.5 5.3 4.1 3.7 7.7C19.5 16.4 12 21 12 21z"/></svg></div>
+        <div class="bar-track"><div class="bar-fill health-fill" style="width: 85%;"></div></div>
+        <span class="bar-num" id="hud-health">85</span>
       </div>
-      <div class="menu-body" id="menu-body"></div>
+      <!-- Броня -->
+      <div class="bar-wrapper">
+        <div class="bar-icon armor-bg"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z"/></svg></div>
+        <div class="bar-track"><div class="bar-fill armor-fill" style="width: 45%;"></div></div>
+        <span class="bar-num" id="hud-armor">45</span>
+      </div>
+      <!-- Голод -->
+      <div class="bar-wrapper">
+        <div class="bar-icon food-bg"><svg viewBox="0 0 24 24"><path d="M4 11h16a1 1 0 0 1 1 1c0 4-3.5 7-9 7s-9-3-9-7a1 1 0 0 1 1-1z"/><path d="M6 11c0-4 2.5-7 6-7s6 3 6 7"/></svg></div>
+        <div class="bar-track"><div class="bar-fill food-fill" style="width: 100%;"></div></div>
+        <span class="bar-num" id="hud-food">100</span>
+      </div>
+      <!-- Вес инвентаря -->
+      <div class="bar-wrapper-weight">
+        <svg class="ic-weight" viewBox="0 0 24 24"><path d="M6 8h12l1.5 12h-15z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>
+        <span id="hud-weight">12.5 кг</span>
+      </div>
     </div>
   </div>
-
-  <div id="hud-debug" style="position:fixed;bottom:40px;left:4px;color:#0f0;font:11px monospace;z-index:99999;background:rgba(0,0,0,0.8);padding:4px 8px;pointer-events:none;white-space:pre;">WAITING...</div>
 
   <script src="hud.js"></script>
-
-</body></html>
+</body>
+</html>
