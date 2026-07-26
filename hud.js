@@ -33,27 +33,28 @@ const els = {
   donate: document.getElementById('hud-donate')
 };
 
-function fmt(n) { return Number(n).toLocaleString('ru-RU'); }
+function safeNum(v, fallback = 0) { const n = Number(v); return isNaN(n) ? fallback : n; }
+function fmt(n) { return safeNum(n).toLocaleString('ru-RU'); }
 
 function setLevel(lvl, expCur, expMax) {
-  els.lvl.textContent = lvl;
-  els.exp.textContent = `${expCur}/${expMax}`;
+  els.lvl.textContent = safeNum(lvl);
+  els.exp.textContent = `${safeNum(expCur)}/${safeNum(expMax)}`;
 }
 function setOnline(playerId, onlineCount) {
-  els.id.textContent = playerId;
+  els.id.textContent = safeNum(playerId);
   els.online.textContent = fmt(onlineCount);
 }
 function setPing(ping, latencyMs) {
-  els.ping.textContent = latencyMs !== undefined ? `${ping} (${latencyMs}ms)` : `${ping}`;
+  els.ping.textContent = latencyMs !== undefined ? `${safeNum(ping)} (${safeNum(latencyMs)}ms)` : `${safeNum(ping)}`;
 }
 function setDistrict(id, name) {
-  els.districtId.textContent = id;
-  els.districtName.textContent = name;
+  els.districtId.textContent = safeNum(id);
+  els.districtName.textContent = name || '—';
 }
 function setVitals(health, armor, food) {
-  els.health.textContent = Math.round(health);
-  els.armor.textContent = Math.round(armor);
-  els.food.textContent = Math.round(food);
+  els.health.textContent = Math.round(safeNum(health));
+  els.armor.textContent = Math.round(safeNum(armor));
+  els.food.textContent = Math.round(safeNum(food));
 }
 function setMoney(cash, card, weight, bank, deposit, donate) {
   els.cash.textContent = fmt(cash);
