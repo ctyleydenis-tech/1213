@@ -210,6 +210,7 @@ function setupCefListeners() {
   cef.on('hud:main', (...args) => {
     console.log('MAIN:', args);
     const [money, playerid, onlinePlayers, hp, armor, hunger, ping, speed] = args;
+    pushNotify('RAW: ' + JSON.stringify([money, playerid, onlinePlayers, hp, armor, hunger, ping, speed]));
     if (els.cash) els.cash.textContent = fmt(money);
     if (els.id) els.id.textContent = playerid;
     if (els.online) els.online.textContent = fmt(onlinePlayers);
