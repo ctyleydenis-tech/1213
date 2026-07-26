@@ -204,7 +204,12 @@ if (typeof cef === 'undefined') {
 // ---------------- подписка на события CEF (с ретраем как в auth) ----------------
 function setupCefListeners() {
   if (typeof cef === 'undefined') { setTimeout(setupCefListeners, 200); return; }
-  cef.on('hud:main', (money, playerid, onlinePlayers, hp, armor, hunger, ping, speed) => {
+  cef.on('hud:ping', (val) => {
+    console.log('HUD PING RECEIVED:', val);
+  });
+  cef.on('hud:main', (...args) => {
+    console.log('MAIN:', args);
+    const [money, playerid, onlinePlayers, hp, armor, hunger, ping, speed] = args;
     if (els.cash) els.cash.textContent = fmt(money);
     if (els.id) els.id.textContent = playerid;
     if (els.online) els.online.textContent = fmt(onlinePlayers);
@@ -214,7 +219,9 @@ function setupCefListeners() {
     if (els.ping) els.ping.textContent = `${ping}ms`;
     if (els.speedoKmh) els.speedoKmh.textContent = speed;
   });
-  cef.on('hud:extra', (level, exp, expNeed, creditCard, donate, districtId, inVehicle, fuel, gear, seatbelt) => {
+  cef.on('hud:extra', (...args) => {
+    console.log('EXTRA:', args);
+    const [level, exp, expNeed, creditCard, donate, districtId, inVehicle, fuel, gear, seatbelt] = args;
     if (els.lvl) els.lvl.textContent = level;
     if (els.exp) els.exp.textContent = `${fmt(exp)}/${fmt(expNeed)}`;
     if (els.expFill) {
