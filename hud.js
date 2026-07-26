@@ -204,11 +204,11 @@ if (typeof cef === 'undefined') {
 // ---------------- подписка на события CEF (с ретраем как в auth) ----------------
 function setupCefListeners() {
   if (typeof cef === 'undefined') { setTimeout(setupCefListeners, 200); return; }
+  const dbg = document.getElementById('hud-debug');
   cef.on('hud:ping', (val) => {
     console.log('HUD PING RECEIVED:', val);
     if (dbg) dbg.textContent = 'PING: ' + JSON.stringify(val);
   });
-  const dbg = document.getElementById('hud-debug');
   cef.on('hud:main', (...args) => {
     console.log('MAIN:', args);
     if (dbg) dbg.textContent = 'MAIN: ' + args.map(v=>JSON.stringify(v)).join(' | ');
