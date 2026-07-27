@@ -2,13 +2,19 @@
   {
     "title": "Открытие проекта Fun Russia!",
     "description": "Сервер Moscow официально открыт. Заходи, выбирай судьбу и начинай свою историю.",
-    "banner": "https://cheatclientnospeck.xo.je/banners/open.png",
+    "banner": "https://cheatclientnospeck.xo.je/banners/forall.png",
     "date": "2026-07-23"
   },
   {
-    "title": "Следующая новость",
-    "description": "...",
-    "banner": "https://cheatclientnospeck.xo.je/banners/next.png",
+    "title": "Набор на лидерские посты!",
+    "description": "Хочешь возглавить полицию, армию или ОПГ? На форуме официально открыты заявки на посты лидеров организаций. Успей подать анкету!",
+    "banner": https://cheatclientnospeck.xo.je/banners/forall.png"",
     "date": "2026-07-24"
-  }
+  },
+   {
+    "title": "test!",
+    "description": "test",
+    "banner": "https://cheatclientnospeck.xo.je/banners/forall.png",
+    "date": "test"
+   }
 ]
